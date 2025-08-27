@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Security 기본 실습</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { text-align: center; color: #333; margin-bottom: 30px; }
+        .welcome { background: #e3f2fd; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .navigation { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .nav-button { padding: 10px 20px; background: #2196f3; color: white; text-decoration: none; border-radius: 5px; transition: background 0.3s; }
+        .nav-button:hover { background: #1976d2; }
+        .info-box { background: #f0f0f0; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .logout-form { margin-top: 20px; }
+        .logout-button { padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🔐 Spring Security 기본 실습</h1>
+        <p>인증과 인가의 동작을 확인해보세요</p>
+    </div>
+
+    <div class="welcome" th:if="${username}">
+        <h2>👋 환영합니다!</h2>
+        <div class="info-box">
+            <strong>로그인 사용자:</strong> <span th:text="${username}">사용자명</span>
+        </div>
+        <div class="info-box">
+            <strong>권한:</strong>
+            <span th:each="auth: ${authorities}">
+                <span th:text="${auth.authority}">권한</span>&nbsp;
+            </span>
+        </div>
+    </div>
+
+    <div class="welcome" th:unless="${username}">
+        <h2>🚪 로그인이 필요합니다</h2>
+        <p>이 페이지를 보려면 인증이 필요합니다.</p>
+    </div>
+
+
+    <div class="navigation">
+        <a href="/" class="nav-button">🏠 홈</a>
+        <a href="/public" class="nav-button">🌍 공개 페이지</a>
+        <a href="/user" class="nav-button">👤 사용자 페이지</a>
+        <a href="/admin" class="nav-button">👨‍💼 관리자 페이지</a>
+    </div>
+
+    <div class="info-box">
+        <h3>📝 실습 안내</h3>
+        <ul>
+            <li><strong>인증 확인:</strong> 로그인하지 않고 위 링크들을 클릭해보세요</li>
+            <li><strong>로그인 테스트:</strong> 기본 사용자명 'user'와 콘솔에 출력된 패스워드 사용</li>
+            <li><strong>권한 테스트:</strong> 로그인 후 각 페이지 접근 테스트</li>
+        </ul>
+    </div>
+
+    <form th:if="${username}" class="logout-form" method="post" action="/logout">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <button type="submit" class="logout-button">🚪 로그아웃</button>
+    </form>
+</div>
+</body>
+</html>
