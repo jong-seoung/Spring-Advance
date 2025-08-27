@@ -28,35 +28,33 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .addFilterBefore(
-                        new FilterOrderLoggingFilter("CUSTOM-EARLY", 1),
-                        UsernamePasswordAuthenticationFilter.class
-                )
-                .addFilterAfter(securityLoggingFilter, BasicAuthenticationFilter.class)
-                .addFilterAfter(
-                        new FilterOrderLoggingFilter("CUSTOM-LATE", 3),
-                        securityLoggingFilter.getClass()
-                )
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/public/**", "/css/**", "/js/**").permitAll()
+                                .requestMatchers("/", "/public/**", "/css/**", "/js/**").permitAll()
+                                .requestMatchers("/api/**").hasAnyRole("API", "ADMIN")
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers("/dashboard").authenticated()
                                 .anyRequest().authenticated()
                 )
                 .formLogin(
                         form -> form
                                 .loginPage("/login").permitAll()
-                                .defaultSuccessUrl("/")
+                                .defaultSuccessUrl("/dashboard", true)
                                 .failureUrl("/login?error=true")
+                                .usernameParameter("username")
+                                .passwordParameter("password")
                 )
+                .httpBasic(basic -> basic.realmName("Basic Auth"))
                 .logout(
                         logout -> logout
                                 .logoutUrl("/logout")
                                 .logoutSuccessUrl("/login?logout=true")
+                                .invalidateHttpSession(true)
+                                .deleteCookies("JSESSIONID")
                                 .permitAll()
                 )
-                .httpBasic(basic -> {})
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
                 .build();
     }
 
@@ -65,7 +63,18 @@ public class SecurityConfig {
         UserDetails user = User.builder().username("user").password(passwordEncoder().encode("password")).roles("USER").build();
         UserDetails admin = User.builder().username("admin").password(passwordEncoder().encode("admin")).roles("ADMIN","USER").build();
 
-        return new InMemoryUserDetailsManager(user, admin);
+        UserDetails apiUser = User.builder()
+                .username("apiuser")
+                .password(passwordEncoder().encode("api123"))
+                .roles("API")
+                .build();
+
+        UserDetails guest = User.builder()
+                .username("guest")
+                .password(passwordEncoder().encode("guest"))
+                .authorities("READ_ONLY")
+                .build();
+        return new InMemoryUserDetailsManager(user, admin, apiUser, guest);
     }
 
     @Bean
