@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>홈 - URL 기반 인가 데모</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>URL 기반 인가 데모</h1>
+        <nav>
+            <a href="/">홈</a>
+            <a href="/about">소개</a>
+            <a href="/contact">연락처</a>
+
+            <div sec:authorize="isAuthenticated()" class="user-menu">
+                <span sec:authentication="name">사용자</span>
+                <a href="/dashboard">대시보드</a>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit">로그아웃</button>
+                </form>
+            </div>
+
+            <div sec:authorize="isAnonymous()">
+                <a href="/login">로그인</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h2>환영합니다!</h2>
+        <p>이 페이지는 누구나 볼 수 있는 공개 페이지입니다.</p>
+
+        <div class="features">
+            <div class="feature-card">
+                <h3>공개 영역</h3>
+                <ul>
+                    <li><a href="/">홈페이지</a> - 모든 사용자</li>
+                    <li><a href="/about">소개 페이지</a> - 모든 사용자</li>
+                    <li><a href="/api/posts">공개 API</a> - 모든 사용자</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>사용자 영역</h3>
+                <ul>
+                    <li><a href="/user/dashboard">사용자 대시보드</a> - USER 권한</li>
+                    <li><a href="/user/profile">프로필</a> - USER 권한</li>
+                    <li>POST /api/posts - USER 권한</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>관리자 영역</h3>
+                <ul>
+                    <li><a href="/admin/dashboard">관리자 대시보드</a> - ADMIN 권한</li>
+                    <li><a href="/admin/users">사용자 관리</a> - ADMIN 권한</li>
+                    <li>DELETE /api/posts/* - ADMIN 권한</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>API 테스트</h3>
+            <button onclick="testPublicAPI()">공개 API 호출</button>
+            <button onclick="testUserAPI()" sec:authorize="hasRole('USER')">사용자 API 호출</button>
+            <button onclick="testAdminAPI()" sec:authorize="hasRole('ADMIN')">관리자 API 호출</button>
+            <div id="api-result"></div>
+        </div>
+    </main>
+</div>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

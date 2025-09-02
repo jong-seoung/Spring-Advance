@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 대시보드</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>관리자 대시보드</h1>
+        <nav>
+            <a href="/">홈</a>
+            <a href="/user/dashboard">사용자 대시보드</a>
+            <a href="/admin/users">사용자 관리</a>
+            <a href="/admin/settings">시스템 설정</a>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit">로그아웃</button>
+            </form>
+        </nav>
+    </header>
+
+    <main>
+        <h2>관리자 대시보드</h2>
+        <p><strong>관리자:</strong> <span th:text="${username}">admin</span></p>
+
+        <div class="admin-stats">
+            <div class="stat-card">
+                <h3>전체 권한</h3>
+                <ul>
+                    <li th:each="auth : ${authorities}" th:text="${auth.authority}">권한</li>
+                </ul>
+            </div>
+
+            <div class="stat-card">
+                <h3>관리자 기능</h3>
+                <ul>
+                    <li>✅ 모든 사용자 기능 접근</li>
+                    <li>✅ 관리자 페이지 (/admin/**)</li>
+                    <li>✅ 모든 HTTP 메서드 허용</li>
+                    <li>✅ 관리자 API (/api/admin/**)</li>
+                    <li>✅ 삭제 권한 (DELETE)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="admin-actions">
+            <h3>관리자 작업</h3>
+            <button onclick="getAdminStats()">관리자 통계 조회</button>
+            <button onclick="deletePost()">게시글 삭제 (DELETE)</button>
+            <button onclick="createPost()">게시글 작성 (POST)</button>
+            <div id="admin-result"></div>
+        </div>
+    </main>
+</div>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

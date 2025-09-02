@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>세션 관리 & CSRF 테스트</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #fff;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .description {
+            font-size: 14px;
+            color: #e0e0e0;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>세션 관리 정책 & CSRF 보호 테스트</h1>
+
+    <div class="grid">
+        <!-- IF_REQUIRED 정책 -->
+        <div class="card">
+            <h3>IF_REQUIRED (기본값)</h3>
+            <div class="description">
+                필요할 때만 세션을 생성합니다. 일반적인 웹 애플리케이션에서 사용하는 기본 정책입니다.
+            </div>
+            <a href="/if-required/login" class="btn">로그인 테스트</a>
+            <a href="/if-required/dashboard" class="btn">대시보드 (인증 필요)</a>
+        </div>
+
+        <!-- ALWAYS 정책 -->
+        <div class="card">
+            <h3>ALWAYS</h3>
+            <div class="description">
+                모든 요청에 대해 세션을 생성합니다. 메모리 사용량이 높지만 완전한 상태 추적이 가능합니다.
+            </div>
+            <a href="/always/login" class="btn">로그인 테스트</a>
+            <a href="/always/dashboard" class="btn">대시보드 (인증 필요)</a>
+        </div>
+
+        <!-- NEVER 정책 -->
+        <div class="card">
+            <h3>NEVER</h3>
+            <div class="description">
+                Spring Security가 세션을 생성하지 않습니다. 기존 세션이 있다면 활용합니다.
+            </div>
+            <a href="/never/login" class="btn">로그인 테스트</a>
+            <a href="/never/dashboard" class="btn">대시보드 (인증 필요)</a>
+        </div>
+
+        <!-- STATELESS 정책 -->
+        <div class="card">
+            <h3>STATELESS (REST API)</h3>
+            <div class="description">
+                세션을 전혀 사용하지 않습니다. JWT 등 토큰 기반 인증이나 REST API에 적합합니다.
+            </div>
+            <a href="/api/public/test" class="btn">공개 API 테스트</a>
+            <button onclick="testBasicAuth()" class="btn">Basic Auth API 테스트</button>
+        </div>
+    </div>
+
+    <!-- CSRF 테스트 -->
+    <div class="card" style="margin-top: 20px;">
+        <h3>CSRF 보호 테스트</h3>
+        <div class="description">
+            Cross-Site Request Forgery 공격을 방어하는 CSRF 토큰의 동작을 확인합니다.
+        </div>
+        <p>IF_REQUIRED 정책에서 로그인 후 CSRF 테스트 폼을 확인해보세요.</p>
+    </div>
+</div>
+
+<script>
+    async function testBasicAuth() {
+        try {
+            const credentials = btoa('user:password'); // Base64 인코딩
+            const response = await fetch('/api/info', {
+                headers: {
+                    'Authorization': 'Basic ' + credentials
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                alert('STATELESS API 테스트 성공:\n' + JSON.stringify(data, null, 2));
+            } else {
+                alert('API 테스트 실패: ' + response.status);
+            }
+        } catch (error) {
+            alert('API 테스트 오류: ' + error.message);
+        }
+    }
+</script>
+</body>
+</html>

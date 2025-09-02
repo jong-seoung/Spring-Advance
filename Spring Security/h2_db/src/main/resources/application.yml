@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: h2-database-demo
+
+  # H2 Database ??
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: h2demo
+
+  # JPA/Hibernate ??
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop  # ?????? ??? ??? ??, ??? ??
+    show-sql: true  # SQL ?? ?? ??
+    properties:
+      hibernate:
+        format_sql: true  # SQL ?? ???
+        use_sql_comments: true  # SQL ?? ??
+
+  # H2 Console ??
+  h2:
+    console:
+      enabled: true  # H2 Console ???
+      path: /h2-console  # ?? ??
+      settings:
+        web-allow-others: false  # ?? ?? ?? (??)
+        trace: false  # ?? ?? ????
+
+# ?? ??
+logging:
+  level:
+    root: INFO
+    com.example: DEBUG
+    org.hibernate.SQL: DEBUG  # SQL ??
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # ???? ??? ??
+
+server:
+  port: 8080
