@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사용자 대시보드</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>사용자 대시보드</h1>
+        <nav>
+            <a href="/">홈</a>
+            <a href="/user/profile">프로필</a>
+            <a href="/user/settings">설정</a>
+            <span sec:authorize="hasRole('ADMIN')">
+                    <a href="/admin/dashboard">관리자 대시보드</a>
+                </span>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit">로그아웃</button>
+            </form>
+        </nav>
+    </header>
+
+    <main>
+        <h2>환영합니다, <span th:text="${username}">사용자</span>님!</h2>
+
+        <div class="info-card">
+            <h3>현재 권한</h3>
+            <ul>
+                <li th:each="auth : ${authorities}" th:text="${auth.authority}">권한</li>
+            </ul>
+        </div>
+
+        <div class="permissions">
+            <h3>접근 가능한 기능</h3>
+            <ul>
+                <li>✅ 사용자 대시보드 (/user/**)</li>
+                <li>✅ 게시글 작성 (POST /api/posts)</li>
+                <li>✅ 게시글 수정 (PUT /api/posts/*)</li>
+                <li>❌ 관리자 대시보드 (/admin/**)</li>
+                <li>❌ 게시글 삭제 (DELETE /api/posts/*)</li>
+            </ul>
+        </div>
+
+        <div class="api-test">
+            <h3>API 테스트</h3>
+            <button onclick="createPost()">게시글 작성 (POST)</button>
+            <button onclick="updatePost()">게시글 수정 (PUT)</button>
+            <button onclick="deletePost()">게시글 삭제 (DELETE) - 실패 예상</button>
+            <div id="result"></div>
+        </div>
+    </main>
+</div>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

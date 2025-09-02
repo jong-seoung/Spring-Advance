@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>사용자 페이지</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #e3f2fd;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>👤 사용자 페이지</h1>
+    <p>안녕하세요, <strong th:text="${username}">사용자</strong>님!</p>
+    <p>이 페이지는 인증된 사용자만 접근 가능합니다.</p>
+    <a href="/">🏠 홈으로 돌아가기</a>
+</div>
+</body>
+</html>
